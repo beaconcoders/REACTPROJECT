@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Linking,
-  Modal
+  Modal,
+  Image
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Color } from '../Color';
@@ -18,10 +19,17 @@ import { useIsFocused } from '@react-navigation/native';
 import MultiUseBtn from '../components/MultiUseBtn';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Time from '../images/time.png';
+import EndTime from '../images/timeleft.png';
+import DayPlan from '../images/planning.png';
+import address from '../images/home.png';
+import Remarks from '../images/list.png';
+import Profile from '../images/user.png';
+import phone from '../images/phone.png';
+
 
 const Teammemberdetail = (route) => {
   const isFocused = useIsFocused();
-  console.log('route::::::::', route.route.params.data);
   const teamId = route.route.params.data;
   const [data, setData] = useState('');
   const [report, setReport] = useState('');
@@ -37,7 +45,6 @@ const Teammemberdetail = (route) => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
       const daystartinfo = JSON.parse(token);
-      console.log('token ::::', daystartinfo);
       setToken(daystartinfo);
       teamdata(daystartinfo);
       return token != null ? JSON.parse(token) : null;
@@ -58,17 +65,14 @@ const Teammemberdetail = (route) => {
     const tem = new Date(date);
     const New = tem.toISOString().split('T');
     const newDate = New[0].split('-');
-    console.log('New Date ::::::', newDate[2] + '-' + newDate[1] + '-' + newDate[0]);
     searchAttendance(newDate[2] + '-' + newDate[1] + '-' + newDate[0]);
     hideDatePicker();
   };
   let searchAttendance = async (date) => {
-    console.log('teamId>>>', teamId, date);
     setIsLoading(true);
     var formdata = new FormData();
     formdata.append("emp_id", teamId);
     formdata.append("date", date);
-    console.log('searchAttendance::::::::', formdata);
     let res = await fetch(`${Apiurl.api}/attendance-report.php`, {
       method: 'post',
       body: formdata,
@@ -79,7 +83,6 @@ const Teammemberdetail = (route) => {
       .then(response => response.text())
       .then(response => {
         const result = JSON.parse(response);
-        console.log('searchAttendance responce::::::::', result);
         setData(result.data)
         setIsLoading(false);
       })
@@ -89,7 +92,6 @@ const Teammemberdetail = (route) => {
       });
   };
   let teamdata = async (val) => {
-    console.log('teamId>>>', teamId);
     setIsLoading(true);
     var formdata = new FormData();
     formdata.append("emp_id", teamId);
@@ -115,12 +117,10 @@ const Teammemberdetail = (route) => {
     const tem = new Date(date);
     const New = tem.toISOString().split('T');
     const newDate = New[0].split('-');
-    console.log('New Date ::::::', newDate[2] + '-' + newDate[1] + '-' + newDate[0]);
     actionReportSearch(newDate[2] + '-' + newDate[1] + '-' + newDate[0]);
     hideDatePicker();
   };
   let actionReportSearch = async (date) => {
-    console.log('teamId>>>', teamId);
     setIsLoading(true);
     var formdata = new FormData();
     formdata.append("emp_id", teamId);
@@ -135,7 +135,6 @@ const Teammemberdetail = (route) => {
       .then(response => response.text())
       .then(response => {
         const result = JSON.parse(response);
-        console.log('actionReportSearch>>>>>>', result);
         setReport(result.data)
         setIsLoading(false);
       })
@@ -145,7 +144,6 @@ const Teammemberdetail = (route) => {
       });
   };
   let actionReport = async () => {
-    console.log('teamId>>>', teamId);
     setIsLoading(true);
     var formdata = new FormData();
     formdata.append("emp_id", teamId);
@@ -159,7 +157,6 @@ const Teammemberdetail = (route) => {
       .then(response => response.text())
       .then(response => {
         const result = JSON.parse(response);
-        console.log('actionReport>>>>>:::::::', result);
         setReport(result.data)
         setIsLoading(false);
       })
@@ -249,25 +246,38 @@ const Teammemberdetail = (route) => {
                 data={data}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => {
-                  console.log('item>>>>>>>>>>', item);
                   return (
                     <View style={{
-                      height: 150,
+                      // height: 170,
                       width: '95%',
                       marginTop: 10,
                       borderRadius: 10,
                       alignSelf: 'center',
-                      backgroundColor: '#1358BB'
+                      backgroundColor: '#1358BB',
+                      padding: 10
                     }}>
                       <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
                         <Text style={styles.txt}>Date: {item.date}</Text>
                       </View>
-                      <View style={{ margin: 10 }}>
-                        <Text style={styles.txt}>Day Plan: {item.day_plan}</Text>
-                        <Text style={styles.txt}>Start Time: {item.start_time}</Text>
-                        <Text style={styles.txt}>End Time: {item.end_time}</Text>
+                      <View style={{ flexDirection: 'row' }}>
+                        <View style={{ margin: 10, justifyContent: 'center', alignItems: 'center' }}>
+                          <Image source={Time} style={{ height: 20, width: 20 }} tintColor={Color.white} />
+                          <Text style={styles.txt}>Start Time: {item.start_time}</Text>
+                        </View>
+                        <View style={{ margin: 10, justifyContent: 'center', alignItems: 'center' }}>
+                          <Image source={EndTime} style={{ height: 20, width: 20 }} tintColor={Color.white} />
+                          <Text style={styles.txt}>End Time: {item.end_time}</Text>
+                        </View>
+                      </View>
+                      <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={EndTime} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
                         <Text style={styles.txt}>Work Hour: {item.worked_hours}</Text>
                       </View>
+                      <View style={{ marginHorizontal: 10, marginVertical: 10, flexDirection: 'row', alignItems: 'center' }}>
+                        <Image source={DayPlan} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
+                        <Text style={styles.txt}>Day Plan: {item.day_plan}</Text>
+                      </View>
+                      {/* </View> */}
                       {/* <View style={{ flexDirection: 'row', height: 30, }}>
                     <TouchableOpacity style={styles.btn}
                       onPress={() => { Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${item.start_location}`) }}>
@@ -309,29 +319,50 @@ const Teammemberdetail = (route) => {
                 data={report}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => {
-                  const newData = JSON.stringify(item.data);
-                  const cleanedData = newData.replace('/data/', '').replace(/\\/g, '').replace(/"/g, '');
-                  console.log('item>>>>>>>>>>', cleanedData);
-                  return (
-                    <View style={{
-                      height: 150,
-                      width: '95%',
-                      marginTop: 10,
-                      borderRadius: 10,
-                      alignSelf: 'center',
-                      backgroundColor: '#1358BB'
-                    }}>
-                      <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
-                        <Text style={styles.txt}>{item.action_name}</Text>
+                  if (item.data && item.data.length > 2) {
+                    const temp = JSON.parse(item.data);
+                    return (
+                      <View style={{
+                        // height: 150,
+                        width: '95%',
+                        marginTop: 10,
+                        borderRadius: 10,
+                        alignSelf: 'center',
+                        backgroundColor: '#1358BB',
+                        padding: 10
+                      }}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
+                          <Text style={styles.txt}>{item.action_name}</Text>
+                        </View>
+                        {temp.Name == undefined ? null :
+                          <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', width: '90%' }}>
+                            <Image source={Profile} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
+                            <Text style={styles.txt}>Name: {temp.Name}</Text>
+                          </View>
+                        }
+                        {temp["Phone No."] == undefined ? null :
+                          <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', width: '90%' }}>
+                            <Image source={phone} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
+                            <Text style={styles.txt}>Phone No.: {temp["Phone No."]}</Text>
+                          </View>
+                        }
+                        {temp.Address == undefined ? null :
+                          <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', width: '90%' }}>
+                            <Image source={address} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
+                            <Text style={styles.txt}>Address: {temp.Address}</Text>
+                          </View>
+                        }
+                        {temp.Remarks == undefined ? null :
+                          <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', width: '90%' }}>
+                            <Image source={Remarks} style={{ height: 20, width: 20, marginRight: 10 }} tintColor={Color.white} />
+                            <Text style={styles.txt}>Remarks: {temp.Remarks}</Text>
+                          </View>
+                        }
                       </View>
-                      <View style={{ margin: 10 }}>
-                        <Text style={styles.txt}>{cleanedData}</Text>
-                        {/* <Text style={styles.txt}>Report Time: {item.start_time}</Text>
-                      <Text style={styles.txt}>Report Time: {item.end_time}</Text>
-                      <Text style={styles.txt}>Report Hour: {item.worked_hours}</Text> */}
-                      </View>
-                    </View>
-                  )
+                    )
+                  } else {
+                    return null;
+                  }
                 }} />
               :
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

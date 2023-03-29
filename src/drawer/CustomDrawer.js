@@ -10,10 +10,22 @@ const CustomDrawer = () => {
   const navigation = useNavigation();
   const [token, setToken] = useState('');
   const [visual2, setVisual2] = useState(false);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     gettoken();
+    getUserDetails();
   });
+  const getUserDetails = async () => {
+    try {
+      const userDetails = await AsyncStorage.getItem('ID');
+      const  userId  = JSON.parse(userDetails).id;
+      setRole(JSON.parse(userDetails).role);
+      return userId != null ? JSON.parse(userId) : null;
+    } catch (error) {
+      console.log('getUserDetails error...........', error);
+    }
+  };
   const gettoken = async () => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
@@ -26,7 +38,6 @@ const CustomDrawer = () => {
   };
 
   let Logout = async () => {
-    console.log('logout token show >>>', token);
     let res = await fetch(`${Apiurl.api}/logout.php`, {
       method: 'post',
       headers: {
@@ -36,10 +47,10 @@ const CustomDrawer = () => {
       .then(response => response.text())
       .then(response => {
         let result = JSON.parse(response)
-        console.log('logout response>>>>>>>>', result.error);
         setVisual2(false);
         if (result.error === false) {
           AsyncStorage.removeItem('TOKEN');
+          AsyncStorage.removeItem('ID');
           navigation.navigate('Login');
         }
       },
@@ -51,7 +62,6 @@ const CustomDrawer = () => {
   };
 
   let profile = async () => {
-    console.log('profile token ::::::', token);
     let res = await fetch(`${Apiurl.api}/profile.php`, {
       method: 'post',
       headers: {
@@ -62,7 +72,6 @@ const CustomDrawer = () => {
       .then(
         response => {
           let result = JSON.parse(response);
-          console.log('profile response', result.data);
           if (result.error === false) {
             navigation.navigate('Profile',{data:result.data})
           }
@@ -88,6 +97,7 @@ const CustomDrawer = () => {
           <Text style={styles.drawercomponenttext}>Dashboard</Text>
         </View>
       </TouchableOpacity>
+      {role === 'manager' ? 
       <TouchableOpacity onPress={() => navigation.navigate('Team Record')}>
         <View style={styles.customimage}>
           <MaterialCommunityIcons
@@ -99,7 +109,8 @@ const CustomDrawer = () => {
           <Text style={styles.drawercomponenttext}>Team</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity>
+      : null}
+      {/* <TouchableOpacity>
         <View style={styles.customimage}>
           <MaterialCommunityIcons
             style={styles.icon}
@@ -109,7 +120,7 @@ const CustomDrawer = () => {
           />
           <Text style={styles.drawercomponenttext}>Day Plan/Report</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={() => setVisual2(true)}>
         <View style={styles.customimage}>
           <MaterialCommunityIcons

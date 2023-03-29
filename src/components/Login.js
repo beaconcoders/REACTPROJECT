@@ -6,21 +6,46 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ToastAndroid,
+  BackHandler,
+  Alert,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import CheckBox from '@react-native-community/checkbox';
-import {useNavigation} from '@react-navigation/native';
-import {Color} from '../Color';
+import { useNavigation } from '@react-navigation/native';
+import { Color } from '../Color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Apiurl} from '../apicomponent/Api';
+import { Apiurl } from '../apicomponent/Api';
 import LinearGradient from 'react-native-linear-gradient';
 
 const Login = () => {
   const navigation = useNavigation();
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
-
-  // console.log(' phone no..........', mobile, password);
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.isFocused()) {
+        Alert.alert('Exit App', 'Are you sure you want to go back?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Yes',
+            onPress: () => {
+              BackHandler.exitApp();
+            },
+          },
+        ]);
+        return true;
+      }
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, [navigation])
   const handlesubmit = () => {
     var myHeaders = new Headers();
     myHeaders.append('Cookie', 'PHPSESSID=9fdaffb8859f803eaabb81c0a9a750b3');
@@ -35,11 +60,9 @@ const Login = () => {
       body: formdata,
       redirect: 'follow',
     };
-    // console.log('requestOptions    >>>', requestOptions);
     fetch(`${Apiurl.api}/login.php`, requestOptions)
       .then(response => response.text())
       .then(async response => {
-        console.log('login >>>>>', JSON.parse(response));
         const token = JSON.parse(response).data.token;
         const id = JSON.parse(response).data;
         AsyncStorage.setItem('ID', JSON.stringify(id));
@@ -56,7 +79,7 @@ const Login = () => {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: Color.white, height: '100%'}}>
+    <SafeAreaView style={{ backgroundColor: Color.white, height: '100%' }}>
       <View>
         <Text style={styles.text}>Login</Text>
         <View style={styles.inputview}>
@@ -83,7 +106,7 @@ const Login = () => {
             margin: 15,
             marginTop: 15,
           }}>
-          <View style={styles.checkboxWrapper}>
+          {/* <View style={styles.checkboxWrapper}>
             <CheckBox />
             <Text style={{color: Color.black, fontWeight: 'bold'}}>
               Logged In
@@ -99,15 +122,15 @@ const Login = () => {
             <Text style={{color: Color.blue, fontWeight: 'bold'}}>
               Forgot Password
             </Text>
-          </View>
+          </View> */}
         </View>
         <View style={styles.button}>
           <TouchableOpacity
-            style={{backgroundColor: Color.royalblue, borderRadius: 5}}
+            style={{ backgroundColor: Color.royalblue, borderRadius: 5 }}
             onPress={handlesubmit}>
             <LinearGradient
               colors={['#0000ff', '#00ced1']}
-              style={{borderRadius: 5}}>
+              style={{ borderRadius: 5 }}>
               <Text style={styles.textbutton}>Submit</Text>
             </LinearGradient>
           </TouchableOpacity>

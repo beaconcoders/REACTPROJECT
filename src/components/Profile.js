@@ -4,7 +4,6 @@ import { Color } from '../Color';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Profile = (route) => {
-  console.log('route in profile >>>>>>>', route.route.params.data);
   let profileDetails = route.route.params.data;
   return (
     <SafeAreaView style={styles.Container}>

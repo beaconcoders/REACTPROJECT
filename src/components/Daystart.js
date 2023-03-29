@@ -36,6 +36,7 @@ const Daystart = () => {
   const [updatePlan, setUpdatePlan] = useState('');
   const [location, setLocation] = useState('');
   const [id, setId] = useState('');
+  const [role, setRole] = useState('');
   const isFocused = useIsFocused();
   useEffect(() => {
     gettoken();
@@ -75,7 +76,7 @@ const Daystart = () => {
     try {
       const userDetails = await AsyncStorage.getItem('ID');
       const  userId  = JSON.parse(userDetails).id;
-      console.log('getUserDetails userId>>>>>>>', userId);
+      setRole(JSON.parse(userDetails).role);
       setId(userId);
       return userId != null ? JSON.parse(userId) : null;
     } catch (error) {
@@ -110,11 +111,9 @@ const Daystart = () => {
         let latitude = position.coords.latitude;
         let location = latitude + ', ' + longitude;
         starDay(location);
-        console.log('positon of location :;:::::::', location, position);
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
-        console.log(error);
       },
       {
         accuracy: {
@@ -209,7 +208,6 @@ const Daystart = () => {
         // if (result.error ===false) {
         setVisual(false);
         // }
-        console.log('getdayplan response', result);
       })
       .catch(error => {
         setVisual(false);
@@ -230,11 +228,9 @@ const Daystart = () => {
         let location = latitude + ', ' + longitude;
         setVisual2(true);
         setLocation(location);
-        console.log('positon of location :;:::::::', location, position);
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
-        console.log(error);
       },
       {
         accuracy: {
@@ -263,7 +259,6 @@ const Daystart = () => {
       .then(response => response.text())
       .then(response => {
         let result = JSON.parse(response);
-        console.log('endday response', result, result.msg);
         setVisual2(false);
         showToast(result.msg);
       })
@@ -406,6 +401,7 @@ const Daystart = () => {
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          {role === 'manager' ? 
           <MultiUseBtn
             width={150}
             height={80}
@@ -423,6 +419,7 @@ const Daystart = () => {
             alignItems={'center'}
             borderRadius={10}
             onPress={() => {navigation.navigate('Team Record') }} />
+            : null}
           {/**Day End btn */}
           <MultiUseBtn
             width={150}

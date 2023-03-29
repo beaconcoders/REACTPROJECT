@@ -33,7 +33,6 @@ const ActionList = () => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
       const daystartinfo = JSON.parse(token);
-      console.log('daystartinfo>>>>>>>', daystartinfo);
       setToken(daystartinfo);
       getactionlist(daystartinfo)
       return token != null ? JSON.parse(token) : null;
@@ -57,7 +56,6 @@ const ActionList = () => {
     })
       .then(response => response.text())
       .then(response => {
-        console.log('get action list response', JSON.parse(response));
         setAction_List(JSON.parse(response).data);
         setLoading(false);
       })
@@ -67,7 +65,7 @@ const ActionList = () => {
       });
   };
   let actionlist = async (listId) => {
-    console.log('listId ::::::', listId);
+    setLoading(true);
     const data = new FormData();
     data.append('action_id', listId.id);
     let res = await fetch(`${Apiurl.api}/get_action.php`, {
@@ -82,33 +80,32 @@ const ActionList = () => {
         let result = JSON.parse(response);
         if (result.data[0] === null) {
           getLocationTOUseAction(listId);
+          setLoading(false);
         } else {
           navigation.navigate('Home Visit', { data: result.data, listId: listId })
+          setLoading(false);
         }
-        console.log('get action data response Day Start...', result.data[0]);
       })
       .catch(error => {
+        setLoading(false);
         console.log('get action data error...', error);
       });
   };
   const getLocationTOUseAction = async (listId) => {
-    console.log('getLocationTOUseAction >>>>>>', listId);
-    const hasPermission = await hasLocationPermission();
+    // const hasPermission = await hasLocationPermission();
 
-    if (!hasPermission) {
-      return;
-    }
+    // if (!hasPermission) {
+    //   return;
+    // }
     Geolocation.getCurrentPosition(
       position => {
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
         let location = latitude + ', ' + longitude;
         action_insert({ location, listId });
-        console.log('positon of location :;:::::::', location, position);
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
-        console.log(error);
       },
       {
         accuracy: {
@@ -127,7 +124,6 @@ const ActionList = () => {
     const data = new FormData();
     data.append('action_id', listId.id);
     data.append('location', location);
-    data.append('data');
     let res = await fetch(`${Apiurl.api}/action_insert.php`, {
       method: 'post',
       body: data,
@@ -138,45 +134,44 @@ const ActionList = () => {
       .then(response => response.text())
       .then(response => {
         showToast(JSON.parse(response).msg)
-        console.log('action insert response...', JSON.parse(response));
       })
       .catch(error => {
         console.log('action insert error...', error);
       });
   };
-  const hasLocationPermission = async () => {
-    if (Platform.OS === 'ios') {
-      const hasPermission = await hasPermissionIOS();
-      return hasPermission;
-    }
-    if (Platform.OS === 'android' && Platform.Version < 23) {
-      return true;
-    }
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-    if (hasPermission) {
-      return true;
-    }
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-    if (status === PermissionsAndroid.RESULTS.GRANTED) {
-      return true;
-    }
-    if (status === PermissionsAndroid.RESULTS.DENIED) {
-      ToastAndroid.show(
-        'Location permission denied by user.',
-        ToastAndroid.LONG,
-      );
-    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      ToastAndroid.show(
-        'Location permission revoked by user.',
-        ToastAndroid.LONG,
-      );
-    }
-    return false;
-  };
+  // const hasLocationPermission = async () => {
+  //   if (Platform.OS === 'ios') {
+  //     const hasPermission = await hasPermissionIOS();
+  //     return hasPermission;
+  //   }
+  //   if (Platform.OS === 'android' && Platform.Version < 23) {
+  //     return true;
+  //   }
+  //   const hasPermission = await PermissionsAndroid.check(
+  //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //   );
+  //   if (hasPermission) {
+  //     return true;
+  //   }
+  //   const status = await PermissionsAndroid.request(
+  //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //   );
+  //   if (status === PermissionsAndroid.RESULTS.GRANTED) {
+  //     return true;
+  //   }
+  //   if (status === PermissionsAndroid.RESULTS.DENIED) {
+  //     ToastAndroid.show(
+  //       'Location permission denied by user.',
+  //       ToastAndroid.LONG,
+  //     );
+  //   } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+  //     ToastAndroid.show(
+  //       'Location permission revoked by user.',
+  //       ToastAndroid.LONG,
+  //     );
+  //   }
+  //   return false;
+  // };
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: Color.white }}>
@@ -209,7 +204,6 @@ const ActionList = () => {
           data={action_list}
           keyExtractor={item => item.id}
           renderItem={({ item }) => {
-            console.log('item>>>>>>>>>>', item);
             return (
               <TouchableOpacity style={styles.Action_listbtn}
                 onPress={() => {

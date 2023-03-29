@@ -25,7 +25,6 @@ const Homevisit = (route) => {
   const listId = route.route.params.data;
   const actionID = route.route.params.listId.id;
   const Action_Name = route.route.params.listId.action_name;
-  console.log('route in home Visit>>>>>', Action_Name);
   const navigation = useNavigation();
   const [token, setToken] = useState('');
   const [userData, setUserData] = useState({});
@@ -38,7 +37,6 @@ const Homevisit = (route) => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
       const daystartinfo = JSON.parse(token);
-      console.log('daystartinfo>>>>', daystartinfo);
       setToken(daystartinfo);
       // action_insert(daystartinfo);
       getLocation();
@@ -49,22 +47,20 @@ const Homevisit = (route) => {
   };
   // get location latitude & longitude to use Start Day
   const getLocation = async () => {
-    const hasPermission = await hasLocationPermission();
+    // const hasPermission = await hasLocationPermission();
 
-    if (!hasPermission) {
-      return;
-    }
+    // if (!hasPermission) {
+    //   return;
+    // }
     Geolocation.getCurrentPosition(
       position => {
         let longitude = position.coords.longitude;
         let latitude = position.coords.latitude;
         let location = latitude + ', ' + longitude;
         setLocation(location);
-        console.log('positon of location :;:::::::', location, position);
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
-        console.log(error);
       },
       {
         accuracy: {
@@ -80,39 +76,39 @@ const Homevisit = (route) => {
     );
   };
   //  location Permission 
-  const hasLocationPermission = async () => {
-    if (Platform.OS === 'ios') {
-      const hasPermission = await hasPermissionIOS();
-      return hasPermission;
-    }
-    if (Platform.OS === 'android' && Platform.Version < 23) {
-      return true;
-    }
-    const hasPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-    if (hasPermission) {
-      return true;
-    }
-    const status = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-    if (status === PermissionsAndroid.RESULTS.GRANTED) {
-      return true;
-    }
-    if (status === PermissionsAndroid.RESULTS.DENIED) {
-      ToastAndroid.show(
-        'Location permission denied by user.',
-        ToastAndroid.LONG,
-      );
-    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      ToastAndroid.show(
-        'Location permission revoked by user.',
-        ToastAndroid.LONG,
-      );
-    }
-    return false;
-  };
+  // const hasLocationPermission = async () => {
+  //   if (Platform.OS === 'ios') {
+  //     const hasPermission = await hasPermissionIOS();
+  //     return hasPermission;
+  //   }
+  //   if (Platform.OS === 'android' && Platform.Version < 23) {
+  //     return true;
+  //   }
+  //   const hasPermission = await PermissionsAndroid.check(
+  //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //   );
+  //   if (hasPermission) {
+  //     return true;
+  //   }
+  //   const status = await PermissionsAndroid.request(
+  //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //   );
+  //   if (status === PermissionsAndroid.RESULTS.GRANTED) {
+  //     return true;
+  //   }
+  //   if (status === PermissionsAndroid.RESULTS.DENIED) {
+  //     ToastAndroid.show(
+  //       'Location permission denied by user.',
+  //       ToastAndroid.LONG,
+  //     );
+  //   } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+  //     ToastAndroid.show(
+  //       'Location permission revoked by user.',
+  //       ToastAndroid.LONG,
+  //     );
+  //   }
+  //   return false;
+  // };
 
   let action_insert = async () => {
     setLoading(true);
@@ -134,7 +130,6 @@ const Homevisit = (route) => {
       .then(response => response.text())
       .then(result => {
         let responseList = JSON.parse(result);
-        console.log(responseList)
         if (responseList.error === false) {
           setLoading(false);
           navigation.navigate('ActionList')
@@ -149,22 +144,24 @@ const Homevisit = (route) => {
     setUserData({ ...userData, [inputName]: inputValue });
   };
   if (loading) {
-    <SafeAreaView
-      style={{ backgroundColor: Color.white, flex: 1 }}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.btn}
-          onPress={() => navigation.navigate('ActionList')}>
-          <Image source={back} style={{ height: 25, width: 25, }} />
-        </TouchableOpacity>
-        <Text style={styles.txtbtn}>{Action_Name}</Text>
-      </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-        <ActivityIndicator
-          size={'large'}
-          color={Color.btn}
-          animating={true} />
-      </View>
-    </SafeAreaView>
+    return (
+      <SafeAreaView
+        style={{ backgroundColor: Color.white, flex: 1 }}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.btn}
+            onPress={() => navigation.navigate('ActionList')}>
+            <Image source={back} style={{ height: 25, width: 25, }} />
+          </TouchableOpacity>
+          <Text style={styles.txtbtn}>{Action_Name}</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+          <ActivityIndicator
+            size={'large'}
+            color={Color.btn}
+            animating={true} />
+        </View>
+      </SafeAreaView>
+    )
   } else {
     return (
       <SafeAreaView
@@ -221,7 +218,7 @@ export default Homevisit;
 const styles = StyleSheet.create({
   fieldtitle: {
     fontSize: 18,
-    padding:6,
+    padding: 6,
     fontWeight: '500',
     color: Color.black,
   },
@@ -232,7 +229,7 @@ const styles = StyleSheet.create({
     color: Color.black,
     borderRadius: 5,
     borderColor: Color.black,
-    paddingHorizontal:6
+    paddingHorizontal: 6
   },
   header: {
     height: 60,

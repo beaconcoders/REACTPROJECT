@@ -72,7 +72,7 @@ const Teamdetail = () => {
                 <MaterialCommunityIcons
                   style={styles.icon}
                   name="account"
-                  color={Color.black}
+                  color={Color.white}
                   size={30}
                 />{' '}
                 {item.item.name}
@@ -81,7 +81,7 @@ const Teamdetail = () => {
                 <MaterialCommunityIcons
                   style={styles.icon}
                   name="email"
-                  color={Color.black}
+                  color={Color.white}
                   size={30}
                 />{' '}
                 {item.item.email}
@@ -90,7 +90,7 @@ const Teamdetail = () => {
                 <MaterialCommunityIcons
                   style={styles.icon}
                   name="phone"
-                  color={Color.black}
+                  color={Color.white}
                   size={30}
                 />{' '}
                 {item.item.phone}
@@ -99,7 +99,7 @@ const Teamdetail = () => {
                 <MaterialCommunityIcons
                   style={styles.icon}
                   name="trending-up"
-                  color={Color.black}
+                  color={Color.white}
                   size={30}
                 />{' '}
                 {item.item.role}
@@ -145,10 +145,12 @@ const styles = StyleSheet.create({
   },
   teamdetailview: {
     flexDirection: 'row',
-    borderColor: Color.black,
+    // borderColor: Color.black,
+    backgroundColor:Color.btn,
     borderWidth: 1,
     margin: 5,
     borderRadius: 5,
+    borderRadius:10
   },
   profileimage: {
     width: 120,
@@ -163,7 +165,7 @@ const styles = StyleSheet.create({
     height: 25,
   },
   teamdetailtext: {
-    color: Color.black,
+    color: Color.white,
     fontWeight: 500,
     fontSize: 20,
   },

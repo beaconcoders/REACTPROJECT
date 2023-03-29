@@ -41,6 +41,8 @@ const Login = () => {
       .then(async response => {
         console.log('login >>>>>', JSON.parse(response));
         const token = JSON.parse(response).data.token;
+        const id = JSON.parse(response).data;
+        AsyncStorage.setItem('ID', JSON.stringify(id));
         try {
           await AsyncStorage.setItem('TOKEN', JSON.stringify(token));
         } catch (error) {

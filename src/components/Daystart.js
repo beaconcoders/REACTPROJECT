@@ -27,6 +27,7 @@ import Plan from '../images/planning.png';
 import EndDay from '../images/logout.png';
 import Action from '../images/action-plan.png';
 import Report from '../images/clipboard.png';
+import team from '../images/team.png'
 const Daystart = () => {
   const navigation = useNavigation();
   const [token, setToken] = useState('');
@@ -34,9 +35,11 @@ const Daystart = () => {
   const [visual2, setVisual2] = useState(false);
   const [updatePlan, setUpdatePlan] = useState('');
   const [location, setLocation] = useState('');
+  const [id, setId] = useState('');
   const isFocused = useIsFocused();
   useEffect(() => {
     gettoken();
+    getUserDetails();
   }, [isFocused]);
   useEffect(() => {
     const backAction = () => {
@@ -68,12 +71,22 @@ const Daystart = () => {
   const showToast = title => {
     Toast.show(title, Toast.SHORT, Toast.BOTTOM)
   }
+  const getUserDetails = async () => {
+    try {
+      const userDetails = await AsyncStorage.getItem('ID');
+      const  userId  = JSON.parse(userDetails).id;
+      console.log('getUserDetails userId>>>>>>>', userId);
+      setId(userId);
+      return userId != null ? JSON.parse(userId) : null;
+    } catch (error) {
+      console.log('getUserDetails error...........', error);
+    }
+  };
   // get token
   const gettoken = async () => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
       const daystartinfo = JSON.parse(token);
-      console.log('daystartinfo>>>>>>>', daystartinfo);
       setToken(daystartinfo);
       return token != null ? JSON.parse(token) : null;
     } catch (error) {
@@ -389,10 +402,27 @@ const Daystart = () => {
             justifyContent={'space-around'}
             alignItems={'center'}
             borderRadius={10}
-            onPress={() => { }} />
+            onPress={() => { navigation.navigate('Team Member', { data: id })}} />
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <MultiUseBtn
+            width={150}
+            height={80}
+            image={team}
+            widthimg={30}
+            heightimg={30}
+            backgroundColor={Color.btn}
+            marginTop={20}
+            margin={10}
+            textcolor={'white'}
+            text={'Team'}
+            fontSize={16}
+            fontWeight={'600'}
+            justifyContent={'space-around'}
+            alignItems={'center'}
+            borderRadius={10}
+            onPress={() => {navigation.navigate('Team Record') }} />
           {/**Day End btn */}
           <MultiUseBtn
             width={150}

@@ -7,21 +7,24 @@ import {
   Image,
   SafeAreaView,
   FlatList,
+  ActivityIndicator
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Color} from '../Color';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Color } from '../Color';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Apiurl} from '../apicomponent/Api';
+import { Apiurl } from '../apicomponent/Api';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Teamdetail = () => {
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [token, setToken] = useState('');
   const [actionData, setActionData] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     gettoken();
-  }, []);
+  }, [isFocused]);
   const gettoken = async () => {
     try {
       const token = await AsyncStorage.getItem('TOKEN');
@@ -34,6 +37,7 @@ const Teamdetail = () => {
     }
   };
   let teamdata = async token => {
+    setIsLoading(true);
     let res = await fetch(`${Apiurl.api}/get_team.php`, {
       method: 'post',
       headers: {
@@ -42,27 +46,27 @@ const Teamdetail = () => {
     })
       .then(response => response.text())
       .then(response => {
-        console.log('teamdata::::::: ', JSON.parse(response));
         setActionData(JSON.parse(response).data);
+        setIsLoading(false);
       })
       .catch(error => {
+        setIsLoading(false);
         console.log('team data error', error);
       });
   };
 
   const RenderItem = item => {
-    console.log('item >>>>>in render >>>>', item.item.id);
     const id = item.item.id;
     return (
-      <View style={{flex: 1 / 3}}>
-        <TouchableOpacity onPress={() => navigation.navigate('Team Member',{data:id})}>
+      <View style={{ flex: 1 / 3 }}>
+        <TouchableOpacity onPress={() => navigation.navigate('Team Member', { data: id })}>
           <View style={styles.teamdetailview}>
-            <MaterialCommunityIcons
+            {/* <MaterialCommunityIcons
               style={styles.icon}
               name="account-circle"
               color={Color.black}
               size={120}
-            />
+            /> */}
             <View style={styles.teamviewtext}>
               <Text style={styles.teamdetailtext}>
                 <MaterialCommunityIcons
@@ -106,25 +110,37 @@ const Teamdetail = () => {
       </View>
     );
   };
-
-  return (
-    <SafeAreaView style={styles.scrollview}>
-      <View style={{flex: 1, backgroundColor: Color.white}}>
-        <FlatList
-          data={actionData}
-          renderItem={RenderItem}
-          keyExtractor={item => item.id}
-        />
-      </View>
-    </SafeAreaView>
-  );
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.scrollview}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+          <ActivityIndicator
+            size={'large'}
+            color={Color.btn}
+            animating={true} />
+        </View>
+      </SafeAreaView>
+    )
+  } else {
+    return (
+      <SafeAreaView style={styles.scrollview}>
+        <View style={{ flex: 1, backgroundColor: Color.white }}>
+          <FlatList
+            data={actionData}
+            renderItem={RenderItem}
+            keyExtractor={item => item.id}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 };
 
 export default Teamdetail;
 
 const styles = StyleSheet.create({
   scrollview: {
-    height: '100%',
+    flex: 1,
     backgroundColor: Color.white,
   },
   teamdetailview: {
